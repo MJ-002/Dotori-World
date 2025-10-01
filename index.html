@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Dotori World</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: #f0f8ff;
+      overflow: hidden;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    #gameInfo {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    #score, #timer {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 5px;
+    }
+    #startBtn {
+      font-size: 20px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #ff7f50;
+      color: white;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    #startBtn:hover {
+      background: #ff6347;
+    }
+    #squirrel {
+      width: 300px;
+      height: 300px;
+      margin-top: 20px;
+    }
+    .target {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background: url("dotori.png") no-repeat center/cover;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="score">모은 도토리: 0</div>
+  <div id="timer">남은 시간: 15</div>
+
+  <button id="startBtn">게임 시작</button>
+
+  <img id="squirrel" src="daram.png" alt="다람이">
+  <div id="gameInfo">다람이에게 줄 도토리를 모으자! 제한시간은 15초!</div>
+
+  <script>
+    let score = 0;
+    let gameInterval;
+    let timerInterval;
+    let timeLeft = 15;
+    let isPlaying = false;
+
+    function spawnTarget() {
+      const target = document.createElement("div");
+      target.className = "target";
+
+      const x = Math.random() * (window.innerWidth - 100);
+      const y = Math.random() * (window.innerHeight - 100);
+      target.style.left = `${x}px`;
+      target.style.top = `${y}px`;
+
+      target.addEventListener("click", () => {
+        if (!isPlaying) return;
+        score++;
+        document.getElementById("score").textContent = `모은 도토리: ${score}`;
+        target.remove();
+      });
+
+      document.body.appendChild(target);
+
+   
+      setTimeout(() => {
+        if (document.body.contains(target)) {
+          target.remove();
+        }
+      }, 1500);
+    }
+
+    function startGame() {
+      if (isPlaying) return;
+      isPlaying = true;
+      score = 0;
+      timeLeft = 15;
+      document.getElementById("score").textContent = "모은 도토리: 0";
+      document.getElementById("timer").textContent = "남은 시간: 15";
+
+
+      document.getElementById("gameInfo").style.display = "none";
+      document.getElementById("startBtn").style.display = "none";
+
+
+      gameInterval = setInterval(spawnTarget, 650);
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").textContent = `남은 시간: ${timeLeft}`;
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function endGame() {
+      clearInterval(gameInterval);
+      clearInterval(timerInterval);
+      isPlaying = false;
+
+      document.querySelectorAll(".target").forEach(t => t.remove());
+
+      alert(`게임 종료! 다람이에게 도토리를 ${score}개 주었다!`);
+      document.getElementById("startBtn").style.display = "block";
+    }
+
+    document.getElementById("startBtn").addEventListener("click", startGame);
+  </script>
+</body>
+</html>
